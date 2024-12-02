@@ -15,15 +15,19 @@ import { Job } from './jobs/job.entity';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
-        type: 'postgres' as const,
-        url: 'postgresql://handyman_owner:h8BJOiTxtP6d@ep-patient-fog-a2kjx4by.eu-central-1.aws.neon.tech/handyman',
+        type: 'postgres',
+        host: configService.get<string>('DB_HOST'),
+        port: configService.get<number>('DB_PORT'),
+        username: configService.get<string>('DB_USERNAME'),
+        password: configService.get<string>('DB_PASSWORD'),
+        database: configService.get<string>('DB_NAME'),
         entities: [User, Job],
-        synchronize: process.env.NODE_ENV !== 'production',
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
         ssl: {
-          rejectUnauthorized: true,
+          rejectUnauthorized: false
         },
         logging: true,
-        logger: "advanced-console" as const
+        logger: "advanced-console"
       }),
       inject: [ConfigService],
     }),

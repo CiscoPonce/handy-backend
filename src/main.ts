@@ -5,6 +5,9 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { DataSource } from 'typeorm';
 
+// Import the ExceptionFilter class
+import { ExceptionFilter } from './exception.filter';
+
 async function bootstrap() {
   try {
     // Create the NestJS application
@@ -34,6 +37,11 @@ async function bootstrap() {
     
     console.log('CORS enabled');
     
+    // Set global API prefix
+    app.setGlobalPrefix('api');
+    
+    console.log('Global API prefix set');
+    
     // Security with custom configuration
     app.use(helmet({
       contentSecurityPolicy: false,
@@ -44,19 +52,19 @@ async function bootstrap() {
     
     console.log('Helmet security configured');
     
-    // Validation
+    // Validation with detailed error messages
     app.useGlobalPipes(new ValidationPipe({
       whitelist: true,
       transform: true,
       forbidNonWhitelisted: true,
+      enableDebugMessages: true,
+      stopAtFirstError: false,
     }));
     
     console.log('Validation pipe configured');
 
-    // Set global prefix
-    app.setGlobalPrefix('api');
-    
-    console.log('Global prefix set to /api');
+    // Global exception filter for detailed error messages
+    app.useGlobalFilters(new ExceptionFilter());
 
     // Swagger documentation
     const config = new DocumentBuilder()

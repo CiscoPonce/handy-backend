@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, UpdateDateColumn } from 'typeorm';
 import { User } from '../users/user.entity';
 
 export enum JobPriority {
@@ -44,12 +44,16 @@ export class Job {
   })
   status: JobStatus;
 
-  @ManyToOne(() => User, user => user.jobs)
+  @ManyToOne(() => User, user => user.jobs, { nullable: false })
+  @JoinColumn({ name: 'userId' })
   user: User;
+
+  @Column({ type: 'uuid', nullable: false })
+  userId: string;
 
   @CreateDateColumn()
   createdAt: Date;
 
-  @CreateDateColumn()
+  @UpdateDateColumn()
   updatedAt: Date;
 }

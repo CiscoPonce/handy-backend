@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, BadRequestException, NotFoundException } from '@nestjs/common';
 import { JobsService } from './jobs.service';
 import { Job, JobPriority, JobStatus } from './job.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { UpdateJobDto } from './dto/update-job.dto';
+import { CreateJobDto } from './dto/create-job.dto';
 
 @ApiTags('jobs')
 @Controller('jobs')
@@ -13,13 +15,18 @@ export class JobsController {
   @Post()
   @ApiOperation({ summary: 'Create a new job' })
   @ApiResponse({ status: 201, description: 'The job has been successfully created.', type: Job })
-  create(@Body() createJobDto: {
-    name: string;
-    priority: JobPriority;
-    comment?: string;
-    userId: string;
-  }): Promise<Job> {
-    return this.jobsService.create(createJobDto);
+  @ApiResponse({ status: 400, description: 'Invalid input data.' })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  async create(@Body() createJobDto: CreateJobDto): Promise<Job> {
+    try {
+      return await this.jobsService.create(createJobDto);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      console.error('Error creating job:', error);
+      throw new BadRequestException(error.message || 'Could not create job');
+    }
   }
 
   @Get()
@@ -46,17 +53,39 @@ export class JobsController {
   @Patch(':id')
   @ApiOperation({ summary: 'Update a job' })
   @ApiResponse({ status: 200, description: 'The job has been successfully updated.', type: Job })
-  update(
+  @ApiResponse({ status: 404, description: 'Job not found.' })
+  @ApiResponse({ status: 400, description: 'Invalid input data or state transition.' })
+  async update(
     @Param('id') id: string,
-    @Body() updateJobDto: {
-      name?: string;
-      priority?: JobPriority;
-      comment?: string;
-      isCompleted?: boolean;
-      status?: JobStatus;
-    },
+    @Body() updateJobDto: UpdateJobDto
   ): Promise<Job> {
-    return this.jobsService.update(id, updateJobDto);
+    try {
+      return await this.jobsService.update(id, updateJobDto);
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        throw new NotFoundException(error.message);
+      }
+      throw new BadRequestException(error.message);
+    }
+  }
+
+  @Patch(':id/status')
+  @ApiOperation({ summary: 'Update job status' })
+  @ApiResponse({ status: 200, description: 'The job status has been successfully updated.', type: Job })
+  @ApiResponse({ status: 404, description: 'Job not found.' })
+  @ApiResponse({ status: 400, description: 'Invalid status transition.' })
+  async updateStatus(
+    @Param('id') id: string,
+    @Body('status') status: JobStatus
+  ): Promise<Job> {
+    try {
+      return await this.jobsService.updateStatus(id, status);
+    } catch (error) {
+      if (error.message.includes('not found')) {
+        throw new NotFoundException(error.message);
+      }
+      throw new BadRequestException(error.message);
+    }
   }
 
   @Delete(':id')
