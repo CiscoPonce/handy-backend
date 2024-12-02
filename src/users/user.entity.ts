@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany, UpdateDateColumn } from 'typeorm';
+import { Job } from '../jobs/job.entity';
 
 @Entity('users')
 export class User {
@@ -16,6 +17,9 @@ export class User {
 
   @Column()
   lastName: string;
+
+  @OneToMany(() => Job, job => job.user)
+  jobs: Job[];
 
   @CreateDateColumn()
   createdAt: Date;
