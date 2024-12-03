@@ -15,7 +15,9 @@ async function bootstrap() {
       logger: ['error', 'warn', 'debug', 'log', 'verbose'],
     });
     
-    console.log('NestJS application created successfully');
+    console.log('Starting NestJS application...');
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Working directory:', process.cwd());
 
     // Test database connection
     try {
@@ -83,11 +85,12 @@ async function bootstrap() {
     
     console.log(`Attempting to start server on ${host}:${port}`);
     
-    await app.listen(port, host);
-    console.log(`Application is running on: http://${host}:${port}`);
-    console.log(`Swagger documentation: http://${host}:${port}/api`);
-    console.log(`Try accessing the API at: http://localhost:${port}/api/users`);
-    console.log(`Local network access: http://192.168.1.246:${port}/api/users`);
+    await app.listen(port, host, () => {
+      console.log(`Application is running on port ${port}`);
+      console.log(`Swagger documentation: http://${host}:${port}/api`);
+      console.log(`Try accessing the API at: http://localhost:${port}/api/users`);
+      console.log(`Local network access: http://192.168.1.246:${port}/api/users`);
+    });
 
     // Add signal handlers for graceful shutdown
     process.on('SIGTERM', async () => {
