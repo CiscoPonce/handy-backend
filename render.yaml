@@ -2,10 +2,13 @@ services:
   - type: web
     name: handy-backend
     env: node
-    buildCommand: npm install && npm run build
-    startCommand: npm run start:prod
+    buildCommand: npm ci && npm run build
+    startCommand: cd dist && node main.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: DATABASE_URL
         value: postgresql://handyman_owner:h8BJOiTxtP6d@ep-patient-fog-a2kjx4by.eu-central-1.aws.neon.tech/handyman?sslmode=require
+      - key: JWT_SECRET
+        value: your-super-secret-jwt-key-change-in-production
+    healthCheckPath: /api/health

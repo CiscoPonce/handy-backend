@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { JobsModule } from './jobs/jobs.module';
 import { User } from './users/user.entity';
 import { Job } from './jobs/job.entity';
+import { HealthController } from './health/health.controller';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { Job } from './jobs/job.entity';
     AuthModule,
     JobsModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}
