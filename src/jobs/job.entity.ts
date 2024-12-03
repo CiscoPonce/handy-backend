@@ -13,7 +13,7 @@ export enum JobStatus {
   REFUSED = 'refused'
 }
 
-@Entity()
+@Entity('job')
 export class Job {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -28,21 +28,21 @@ export class Job {
   })
   priority: JobPriority;
 
-  @CreateDateColumn()
-  date: Date;
-
-  @Column({ type: 'text', nullable: true })
-  comment: string;
-
-  @Column({ default: false })
-  isCompleted: boolean;
-
   @Column({
     type: 'enum',
     enum: JobStatus,
     default: JobStatus.PENDING
   })
   status: JobStatus;
+
+  @Column({ default: false })
+  isCompleted: boolean;
+
+  @Column({ type: 'text', nullable: true })
+  comment: string;
+
+  @CreateDateColumn()
+  date: Date;
 
   @ManyToOne(() => User, user => user.jobs, { nullable: false })
   @JoinColumn({ name: 'userId' })

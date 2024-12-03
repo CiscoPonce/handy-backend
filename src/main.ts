@@ -6,7 +6,7 @@ import helmet from 'helmet';
 import { DataSource } from 'typeorm';
 
 // Import the ExceptionFilter class
-import { ExceptionFilter } from './exception.filter';
+import { AllExceptionsFilter } from './exception.filter';
 
 async function bootstrap() {
   try {
@@ -64,7 +64,7 @@ async function bootstrap() {
     console.log('Validation pipe configured');
 
     // Global exception filter for detailed error messages
-    app.useGlobalFilters(new ExceptionFilter());
+    app.useGlobalFilters(new AllExceptionsFilter());
 
     // Swagger documentation
     const config = new DocumentBuilder()

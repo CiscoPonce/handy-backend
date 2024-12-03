@@ -19,12 +19,15 @@ export class JobsController {
   @ApiResponse({ status: 404, description: 'User not found.' })
   async create(@Body() createJobDto: CreateJobDto): Promise<Job> {
     try {
-      return await this.jobsService.create(createJobDto);
+      console.log('Received create job request with data:', createJobDto);
+      const result = await this.jobsService.create(createJobDto);
+      console.log('Successfully created job:', result);
+      return result;
     } catch (error) {
+      console.error('Error in jobs controller create method:', error);
       if (error instanceof NotFoundException) {
         throw error;
       }
-      console.error('Error creating job:', error);
       throw new BadRequestException(error.message || 'Could not create job');
     }
   }

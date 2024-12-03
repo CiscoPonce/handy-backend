@@ -8,16 +8,18 @@ config();
 
 const configService = new ConfigService();
 
-export default new DataSource({
+const AppDataSource = new DataSource({
   type: 'postgres',
-  host: configService.get('DB_HOST'),
-  port: configService.get('DB_PORT'),
-  username: configService.get('DB_USERNAME'),
-  password: configService.get('DB_PASSWORD'),
-  database: configService.get('DB_NAME'),
+  url: configService.get('DATABASE_URL'), // We'll update .env to use DATABASE_URL
+  ssl: true,
   entities: [User, Job],
   migrations: ['src/migrations/*.ts'],
-  ssl: {
-    rejectUnauthorized: false
+  connectTimeoutMS: 10000,
+  extra: {
+    ssl: {
+      rejectUnauthorized: false
+    }
   }
 });
+
+export default AppDataSource;
