@@ -3,7 +3,7 @@ services:
     name: handy-backend
     env: node
     buildCommand: npm ci && npm run build
-    startCommand: cd dist && node main.js
+    startCommand: node dist/main.js
     envVars:
       - key: NODE_ENV
         value: production
